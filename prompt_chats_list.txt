@@ -1,0 +1,19 @@
+{
+  "msgs": [
+    {
+      "msg": "Hi, my name is Gerald Yong and my NRIC is S7384092F. My date of birth is 10/20/1970. I currently work in Privitar Singapore and my home address is 20 West Coast Vale, #10-10, S(126753). I work as a Solutions Architect and I service customers in the UK, US and Singapore. I can be contacted at my HP 90203949, or email me at geraldyong17@yahoo.com.""
+    },
+    {
+      "msg": "My name is Benjamin Chan. I would like to make a reservation for 2 tickets for the Jay Chou concert. I would like to purchase the $80 seats. My phone number is 97382938 and my email is benjamin_chan@gmail.com."
+    },
+    {
+      "msg": "I would like to report that the lifts in Blk 473 Jurong West Ave 1 are consistently very dirty. I noticed there are yellow stains on the walls. Just last week there was a foul smell for the whole day. Can you urgently ask someone to lookinto this please."
+    },
+    {
+      "msg": "I am staying in 70 Simei Drive #05-05 and I would like to report constant noise disruption from my neighbour in #05-04. On several days this week, they were making a lot of noise after 1030PM, and I could hear banging and sounds of furnitue being dragged across the floor. Please look into this urgently as my kids are not able to sleep with all the noise."
+    },
+    {
+      "msg": "My name is John Tan and I wish to express my disappointment over my recent food delivery from Tiger Express. I had ordered Splendid Duck Rice from Jurong East Mall and when the delivery arrived, the gravy had spilled. Moreover, they also forgot to include the chilli sauce and the utensils. This is not the first time they have done this. I would like to escalate this matter."
+    }
+  ]
+}
