@@ -65,8 +65,10 @@ async def deidentify_text(clearmsg: ClearText):
         {clearmsg}
         ```
         """
-        safemsg = helper.deidentify_text(prompt, max_tokens = 2000, llm_model = "gpt-4-1106-preview")
 
+        safemsg_out = helper.deidentify_text(prompt, max_tokens = 2000, llm_model = "gpt-4-1106-preview")
+        safemsg = SafeText(safemsg_out)
+        
         return safemsg
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))

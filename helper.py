@@ -49,7 +49,7 @@ openai.api_key = os.getenv('OPENAI_API_KEY')
 openai.organization = os.getenv('OPENAI_ORGANIZATION_ID')
 
 def deidentify_text(prompt, max_tokens, llm_model = "gpt-4-1106-preview"):
-    # Takes a prompt that contains a Singlish message and explain what it means.
+    # Takes a prompt that contains a message and deidentifies it.
     messages = [{"role": "user", "content": prompt}]
     response = openai.ChatCompletion.create(
         model = llm_model,
