@@ -28,7 +28,7 @@ Note: This code uses ChatGPT4 APIs.
      -out geraldyong-cert.pem \
      -keyout geraldyong-priv.pem -days 365
    ```
-   For example, I'm using mydomain.com as my CN.
+   For example, I'm using `mydomain.com` as my `CN`.
    If you change the file names, you will have to change the filenames in `Dockerfile` and in the `privacy_ms.py` file.
 4. Edit `/etc/hosts`:
    `vim /etc/hosts`
@@ -50,7 +50,7 @@ Note: This code uses ChatGPT4 APIs.
 
 1. Build the docker image.
    ```
-   docker build -t singlish:latest .
+   docker build -t privacy:latest .
    ```
 2. Bring up the docker serivce.
    ```
@@ -58,7 +58,7 @@ Note: This code uses ChatGPT4 APIs.
    ```
 3. Check that the container is up.
    ```
-   docker ps -a | grep singlish
+   docker ps -a | grep privacy
    ```
 
 ## Example prompt inputs
