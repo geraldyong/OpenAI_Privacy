@@ -5,7 +5,7 @@ WORKDIR /app
 COPY privacy_ms.py /app
 COPY helper.py /app
 COPY requirements.txt /app
-COPY certs /app
+COPY certs /app/certs/
 
 RUN pip install -r requirements.txt \
     pip install "uvicorn[standard]"
