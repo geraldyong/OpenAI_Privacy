@@ -25,13 +25,15 @@ Note: This code uses ChatGPT4 APIs.
 3. Generate your self-signed certificates.
    ```
    openssl req -x509 -newkey rsa:4096 -nodes \
-     -out geraldyong-cert.pem \
-     -keyout geraldyong-priv.pem -days 365
+     -out mydomain-cert.pem \
+     -keyout mydomain-priv.pem -days 365
    ```
    For example, I'm using `mydomain.com` as my `CN`.
    If you change the file names, you will have to change the filenames in `Dockerfile` and in the `privacy_ms.py` file.
 4. Edit `/etc/hosts`:
-   `vim /etc/hosts`
+   ```
+   vim /etc/hosts
+   ```
    Add an entry for your domain.
    ```
    127.0.0.1   localhost mydomain.com
@@ -39,8 +41,8 @@ Note: This code uses ChatGPT4 APIs.
 5. Start up the microservice.
    ```
    uvicorn privacy_ms:app --reload \
-     --ssl-certfile certs/geraldyong-cert.pem \
-     --ssl-keyfile certs/geraldyong-priv.pem 
+     --ssl-certfile certs/mydomain-cert.pem \
+     --ssl-keyfile certs/mydomain-priv.pem 
    ```
 6. Load up the browser to point to your domain, e.g. `https://mydomain.com:8000`
 7. Access the `/docs` endpoint.
