@@ -49,12 +49,12 @@ async def deidentify_text(clearmsg: ClearText):
         1. Identify the category of personal identifiers and quasi identifiers in the text
         2. Determine if the identifier type is personal or quasi.
         3. Apply an appropriate privacy enhancing technique on the identifier:
-        a.  For names, please generate a random full name. Do not use a placeholder.
+        a. For names, please generate a random full name. Do not use a placeholder.
         b. For NRICs, keep only the last 4 characters.
         c. For date of birth, replace with age, rounded up to the nearest decade.
         d. For addresses, block out the block number and unit numbers with '0'.
         e. For postal codes, replace the last 3 characters with '000'.
-        f. For phone numbers, keep the first digit and replace the rest of the the digits with numbers.
+        f. For phone numbers, keep the first digit and replace the rest of the digits with numbers.
         g. For emails, replace the front part with a random string of alphanumeric characters. Do not use a placeholder.
 
         Do not explain your processing.
@@ -67,8 +67,8 @@ async def deidentify_text(clearmsg: ClearText):
         """
 
         safemsg_out = helper.deidentify_text(prompt, max_tokens = 2000, llm_model = "gpt-4-1106-preview")
-        safemsg = SafeText(safemsg_out)
-        
+        safemsg = SafeText(**safemsg_out)
+
         return safemsg
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -77,7 +77,7 @@ async def deidentify_text(clearmsg: ClearText):
 @app.post("/deidentify/msg/pii")
 async def deidentify_get_pii(clearmsg: ClearText):
     # Extracts the list of PII from text.
-    #try:
+    try:
         prompt = f"""
         I will provide a JSON enclosed in triple backticks. The JSON contains a sample text.
 
@@ -85,12 +85,12 @@ async def deidentify_get_pii(clearmsg: ClearText):
         1. Identify the category of personal identifiers and quasi identifiers in the text
         2. Determine if the identifier type is personal or quasi.
         3. Apply an appropriate privacy enhancing technique on the identifier:
-        a.  For names, please generate a random full name. Do not use a placeholder.
+        a. For names, please generate a random full name. Do not use a placeholder.
         b. For NRICs, keep only the last 4 characters.
         c. For date of birth, replace with age, rounded up to the nearest decade.
         d. For addresses, block out the block number and unit numbers with '0'.
         e. For postal codes, replace the last 3 characters with '000'.
-        f. For phone numbers, keep the first digit and replace the rest of the the digits with numbers.
+        f. For phone numbers, keep the first digit and replace the rest of the digits with numbers.
         g. For emails, replace the front part with a random string of alphanumeric characters. Do not use a placeholder.
 
         Do not explain your processing.
@@ -105,8 +105,8 @@ async def deidentify_get_pii(clearmsg: ClearText):
         safemsg = helper.deidentify_text(prompt, max_tokens = 2000, llm_model = "gpt-4-1106-preview")
 
         return safemsg
-    #except Exception as e:
-    #    raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @app.post("/deidentify/msg_list")
@@ -126,7 +126,7 @@ async def deidentify_list(clearmsglist: ClearTextList):
         c. For date of birth, replace with age, rounded up to the nearest decade.
         d. For addresses, block out the block number and unit numbers with '0'.
         e. For postal codes, replace the last 3 characters with '000'.
-        f. For phone numbers, keep the first digit and replace the rest of the the digits with numbers.
+        f. For phone numbers, keep the first digit and replace the rest of the digits with numbers.
         g. For emails, replace the front part with a random string of alphanumeric characters. Do not use a placeholder.
 
         Do not explain your processing.
