@@ -1,5 +1,5 @@
 import os
-import openai
+from openai import OpenAI
 import re
 
 # ---------------------------------------------------------------
@@ -44,16 +44,19 @@ def remove_json_prefix(s: str) -> str:
     return re.sub(r"^JSON", r"", s, flags=re.IGNORECASE)
 
 
-# OpenAI 
-openai.api_key = os.getenv('OPENAI_API_KEY')
-openai.organization = os.getenv('OPENAI_ORGANIZATION_ID')
+# OpenAI
+client = OpenAI(
+  api_key = os.getenv('OPENAI_API_KEY'),
+)
 
 def deidentify_text(prompt, max_tokens, llm_model = "gpt-4-1106-preview"):
     # Takes a prompt that contains a message and deidentifies it.
-    messages = [{"role": "user", "content": prompt}]
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model = llm_model,
-        messages=messages
+        max_tokens = max_tokens,
+        messages = [
+            {"role": "system", "content": prompt},
+        ]
     )
 
     return eval(
