@@ -14,134 +14,148 @@ import ssl
 import helper
 
 # Set up the Server
-app = FastAPI()
+app = FastAPI(
+  title="Privacy Enhancement Techniques (PET) Applicator",
+  description = "Using OpenAPI, deidentify a message by applying privacy enhancement techniques on personal indentifiers."
+)
 ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
 ssl_context.load_cert_chain('certs/geraldyong-cert.pem', keyfile='certs/geraldyong-priv.pem')
 
 
 # Define the base models
 class ClearText(BaseModel):
-    msg: str
+  msg: str
 
 class ClearTextList(BaseModel):
-    msg_list: List[ClearText]
+  msg_list: List[ClearText]
 
 class SafeText(BaseModel):
-    msg: str
+  msg: str
 
 class SafeTextList(BaseModel):
-    msg_list: List[SafeText]
+  msg_list: List[SafeText]
 
 
-@app.get("/")
+@app.get("/",
+         summary="Gets the API version.", tags=["Version"])
 async def get_root():
-    return {"version": "0.0.1"}
+  return {"version": "0.0.1"}
 
 
-@app.post("/deidentify/msg")
+@app.post("/deidentify/msg",
+          summary="Given a text message, deidentify personal identifiers in the text.", tags=["Deidentification"])
 async def deidentify_text(clearmsg: ClearText):
-    # Deidentifies text.
-    try:
-        prompt = f"""
-        I will provide a JSON enclosed in triple backticks. The JSON contains a sample text.
+  """
+    Deidentifies text.
+  """
+  try:
+    prompt = f"""
+      I will provide a JSON enclosed in triple backticks. The JSON contains a sample text.
 
-        For this text, please perform the following:
-        1. Identify the category of personal identifiers and quasi identifiers in the text
-        2. Determine if the identifier type is personal or quasi.
-        3. Apply an appropriate privacy enhancing technique on the identifier:
-        a. For names, please generate a random full name. Do not use a placeholder.
-        b. For NRICs, keep only the last 4 characters.
-        c. For date of birth, replace with age, rounded up to the nearest decade.
-        d. For addresses, block out the block number and unit numbers with '0'.
-        e. For postal codes, replace the last 3 characters with '000'.
-        f. For phone numbers, keep the first digit and replace the rest of the digits with numbers.
-        g. For emails, replace the front part with a random string of alphanumeric characters. Do not use a placeholder.
+      For this text, please perform the following:
+      1. Identify the category of personal identifiers and quasi identifiers in the text
+      2. Determine if the identifier type is personal or quasi.
+      3. Apply an appropriate privacy enhancing technique on the identifier:
+      a. For names, please generate a random full name. Do not use a placeholder.
+      b. For NRICs, keep only the last 4 characters.
+      c. For date of birth, replace with age, rounded up to the nearest decade.
+      d. For addresses, block out the block number and unit numbers with '0'.
+      e. For postal codes, replace the last 3 characters with '000'.
+      f. For phone numbers, keep the first digit and replace the rest of the digits with numbers.
+      g. For emails, replace the front part with a random string of alphanumeric characters. Do not use a placeholder.
 
-        Do not explain your processing.
-        Return only a JSON containing the sample text with the identifiers replaced with their masked values.
+      Do not explain your processing.
+      Return only a JSON containing the sample text with the identifiers replaced with their masked values.
 
-        JSON:
-        ```
-        {clearmsg}
-        ```
-        """
+      JSON:
+      ```
+      {clearmsg}
+      ```
+    """
 
-        safemsg_out = helper.deidentify_text(prompt, max_tokens = 2000, llm_model = "gpt-4-1106-preview")
-        safemsg = SafeText(**safemsg_out)
+    safemsg_out = helper.deidentify_text(prompt, max_tokens = 2000, llm_model = "gpt-4-1106-preview")
+    safemsg = SafeText(**safemsg_out)
 
-        return safemsg
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    return safemsg
+  except Exception as e:
+    raise HTTPException(status_code=400, detail=str(e))
     
 
-@app.post("/deidentify/msg/pii")
+@app.post("/extract/msg/pii",
+          summary="Extract and classify personal identifies found in a text.", tags=["Extract Identifiers"])
 async def deidentify_get_pii(clearmsg: ClearText):
-    # Extracts the list of PII from text.
-    try:
-        prompt = f"""
-        I will provide a JSON enclosed in triple backticks. The JSON contains a sample text.
+  """
+    Extracts the list of PII from text.
+  """
+  try:
+    prompt = f"""
+      I will provide a JSON enclosed in triple backticks. The JSON contains a sample text.
 
-        For this text, please perform the following:
-        1. Identify the category of personal identifiers and quasi identifiers in the text
-        2. Determine if the identifier type is personal or quasi.
-        3. Apply an appropriate privacy enhancing technique on the identifier:
-        a. For names, please generate a random full name. Do not use a placeholder.
-        b. For NRICs, keep only the last 4 characters.
-        c. For date of birth, replace with age, rounded up to the nearest decade.
-        d. For addresses, block out the block number and unit numbers with '0'.
-        e. For postal codes, replace the last 3 characters with '000'.
-        f. For phone numbers, keep the first digit and replace the rest of the digits with numbers.
-        g. For emails, replace the front part with a random string of alphanumeric characters. Do not use a placeholder.
+      For this text, please perform the following:
+      1. Identify the category of personal identifiers and quasi identifiers in the text
+      2. Determine if the identifier type is personal or quasi.
+      3. Apply an appropriate privacy enhancing technique on the identifier:
+      a. For names, please generate a random full name. Do not use a placeholder.
+      b. For NRICs, keep only the last 4 characters.
+      c. For date of birth, replace with age, rounded up to the nearest decade.
+      d. For addresses, block out the block number and unit numbers with '0'.
+      e. For postal codes, replace the last 3 characters with '000'.
+      f. For phone numbers, keep the first digit and replace the rest of the digits with numbers.
+      g. For emails, replace the front part with a random string of alphanumeric characters. Do not use a placeholder.
 
-        Do not explain your processing.
-        Return only a JSON with the following keys 'msg' containing a list of keys 'pii_category','pii_type',
-        'original_value','masked_value'.
+      Do not explain your processing.
+      Return only a JSON with the following keys 'msg' containing a list of keys 'pii_category','pii_type',
+      'original_value','masked_value'.
 
-        JSON:
-        ```
-        {clearmsg}
-        ```
-        """
-        safemsg = helper.deidentify_text(prompt, max_tokens = 2000, llm_model = "gpt-4-1106-preview")
+      JSON:
+      ```
+      {clearmsg}
+      ```
+    """
+    
+    safemsg = helper.deidentify_text(prompt, max_tokens = 2000, llm_model = "gpt-4-1106-preview")
 
-        return safemsg
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    return safemsg
+  except Exception as e:
+    raise HTTPException(status_code=400, detail=str(e))
 
 
-@app.post("/deidentify/msg_list")
+@app.post("/deidentify/msg_list",
+          summary="Given a list of text messages, deidentify personal identifiers in each text.", tags=["Deidentification"])
 async def deidentify_list(clearmsglist: ClearTextList):
-    # Deidentifies a list of text.
-    try:
+  """
+    Deidentifies a list of text.
+  """
+  try:
     # Create ab empty list to store the converted quotes.
-        prompt = f"""
-        I will provide a JSON list of sample text enclosed in triple backticks.
+    prompt = f"""
+      I will provide a JSON list of sample text enclosed in triple backticks.
 
-        For each text in the list, please perform the following:
-        1. Identify the category of personal identifiers and quasi identifiers in the text
-        2. Determine if the identifier type is personal or quasi.
-        3. Apply an appropriate privacy enhancing technique on the identifier:
-        a. For names, please generate a random full name. Do not use a placeholder.
-        b. For NRICs, keep only the last 4 characters.
-        c. For date of birth, replace with age, rounded up to the nearest decade.
-        d. For addresses, block out the block number and unit numbers with '0'.
-        e. For postal codes, replace the last 3 characters with '000'.
-        f. For phone numbers, keep the first digit and replace the rest of the digits with numbers.
-        g. For emails, replace the front part with a random string of alphanumeric characters. Do not use a placeholder.
+      For each text in the list, please perform the following:
+      1. Identify the category of personal identifiers and quasi identifiers in the text
+      2. Determine if the identifier type is personal or quasi.
+      3. Apply an appropriate privacy enhancing technique on the identifier:
+      a. For names, please generate a random full name. Do not use a placeholder.
+      b. For NRICs, keep only the last 4 characters.
+      c. For date of birth, replace with age, rounded up to the nearest decade.
+      d. For addresses, block out the block number and unit numbers with '0'.
+      e. For postal codes, replace the last 3 characters with '000'.
+      f. For phone numbers, keep the first digit and replace the rest of the digits with numbers.
+      g. For emails, replace the front part with a random string of alphanumeric characters. Do not use a placeholder.
 
-        Do not explain your processing.
-        Return only a JSON with the following key 'msg_list' containing a list of 'msg' keys, each 'msg' key is the transformed
-        sample text with the identifiers replaced with their masked values.
+      Do not explain your processing.
+      Return only a JSON with the following key 'msg_list' containing a list of 'msg' keys, each 'msg' key is the transformed
+      sample text with the identifiers replaced with their masked values.
 
-        Sample text:
-        ```
-        {clearmsglist}
-        ```
-        """
-        safemsglist_out = helper.deidentify_text(prompt, max_tokens = 2000, llm_model = "gpt-4-1106-preview")
-        safemsglist = SafeTextList(**safemsglist_out)
+      Sample text:
+      ```
+      {clearmsglist}
+      ```
+    """
+    safemsglist_out = helper.deidentify_text(prompt, max_tokens = 2000, llm_model = "gpt-4-1106-preview")
+    safemsglist = SafeTextList(**safemsglist_out)
 
-        return safemsglist
-    except Exception as e:
-        # Handle exceptions
-        raise HTTPException(status_code=500, detail=str(e))
+    return safemsglist
+  except Exception as e:
+    # Handle exceptions
+    raise HTTPException(status_code=500, detail=str(e))

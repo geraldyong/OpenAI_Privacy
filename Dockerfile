@@ -1,14 +1,22 @@
-FROM python:3.11-slim
+FROM python:3.12-slim
 
+# Create app user.
+# Use this for non-alpine.
+#RUN useradd --user-group --system --no-log-init --create-home appusr
+# Use this for alpine.
+RUN addgroup --system apps --gid 1000 && adduser --system appuser --uid 1000 --gid 1000
+
+# Copy files.
 WORKDIR /app
+COPY --chown=appuser:apps *.py  /app
+COPY --chown=appuser:apps requirements.txt /app
+COPY --chown=appuser:apps certs /app/certs
 
-COPY privacy_ms.py /app
-COPY helper.py /app
-COPY requirements.txt /app
-COPY certs /app/certs/
+RUN pip install --no-cache-dir -r requirements.txt && \
+    pip install --no-cache-dir "uvicorn[standard]" && \
+    rm -f /app/requirements.txt
 
-RUN pip install -r requirements.txt \
-    pip install "uvicorn[standard]"
+USER appuser
 
 EXPOSE 8000
 
